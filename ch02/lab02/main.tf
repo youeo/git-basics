@@ -1,4 +1,4 @@
-resource "aws_iam_role" "instance_minimal" {
+resource "aws_iam_role" "this" {
   name = "${local.project}-iamrole-instance-minimal"
 
   assume_role_policy = jsonencode({
@@ -17,22 +17,22 @@ resource "aws_iam_role" "instance_minimal" {
   }
 }
 
-resource "aws_iam_role_policy_attachment" "instance_minimal_ssm" {
-  role       = aws_iam_role.instance_minimal.name
+resource "aws_iam_role_policy_attachment" "this" {
+  role       = aws_iam_role.this.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
-resource "aws_iam_instance_profile" "instance_minimal" {
+resource "aws_iam_instance_profile" "this" {
   name = "${local.project}-iamprofile-instance-minimal"
 
-  role = aws_iam_role.instance_minimal.name
+  role = aws_iam_role.this.name
 
   tags = {
     Name = "${local.project}-iamprofile-instance-minimal"
   }
 }
 
-resource "aws_security_group" "instance_minimal" {
+resource "aws_security_group" "this" {
   name = "${local.project}-sg-instance-minimal"
 
   ingress {
@@ -54,13 +54,13 @@ resource "aws_security_group" "instance_minimal" {
   }
 }
 
-resource "aws_instance" "minimal" {
+resource "aws_instance" "this" {
   ami                    = "ami-0c003e98ceffee43e"
   instance_type          = "t3.micro"
-  vpc_security_group_ids = [aws_security_group.instance_minimal.id]
+  vpc_security_group_ids = [aws_security_group.this.id]
 
-  iam_instance_profile = aws_iam_instance_profile.instance_minimal.name
-  depends_on           = [aws_iam_role_policy_attachment.instance_minimal_ssm]
+  iam_instance_profile = aws_iam_instance_profile.this.name
+  depends_on           = [aws_iam_role_policy_attachment.this]
 
   tags = {
     Name = "${local.project}-instance-minimal"

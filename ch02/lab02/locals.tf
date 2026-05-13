@@ -5,4 +5,17 @@ locals {
     port = 80,
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  instance = {
+    name = "web"
+    allow_access = {
+      port        = 80
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+  }
+
+  iamrole = {
+    name = "minimal-role"
+  }
+
 }
