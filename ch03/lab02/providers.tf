@@ -9,14 +9,13 @@ terraform {
   }
 
   backend "s3" {
-      bucket       = "tf-core-ej-tfstate"
-      key          = "04.03/lab02/terraform.tfstate"
-      region       = "ap-northeast-2"
-      encrypt      = true
-      use_lockfile = true
+    bucket       = "tf-core-ej-tfstate"
+    key          = "gallery/terraform.tfstate"
+    region       = "ap-northeast-2"
+    encrypt      = true
+    use_lockfile = true
   }
 }
-
 
 provider "aws" {
   region = "ap-northeast-2"
