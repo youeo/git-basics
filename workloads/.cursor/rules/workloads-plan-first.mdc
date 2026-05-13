@@ -1,0 +1,24 @@
+---
+description: 특정 Workload를 대상으로 작업할 때 .cursor/plan/workloads/{name}.md를 먼저 읽는다. 향후 스킬(리팩토링·기능 제안 등) 공통 전제.
+globs:
+  - "**/Cloud/Workloads/**"
+  - "**/gallery-spring-boot/**"
+  - "**/.cursor/plan/**"
+  - "**/.cursor/skills/**"
+  - "**/.cursor/refactoring/**"
+alwaysApply: false
+---
+
+# Workload 작업 전: plan/workloads 우선
+
+- **대상:** `Cloud/Workloads/{workload-name}/` 앱을 가리키는 **모든 에이전트 작업** (코드 리뷰·리팩토링 추적, 기능 개선·아이디어 반영, 향후 추가되는 Workload 전용 스킬 등).
+- **필수 1순위 문서:** `Cloud/Workloads/.cursor/plan/workloads/{workload-name}.md`  
+  - **개요, 구현/계획 기능, 설정 키, 시리즈와의 정렬**을 파악한 뒤 코드·다른 내부 문서를 본다.
+- **파일이 없을 때:** `.cursor/plan/matrix.md` → 해당 Workload `README.md` 순으로 보조한다. 그래도 맥락이 부족하면 **plan 초안 작성 여부**를 사용자에게 확인한다.
+- **새로 Workload를 계획할 때**는 `plan/workloads/{name}.md` 를 **가장 먼저** 두는 흐름이 권장된다. 요약은 `.cursor/plan/README.md` 의 「새 Workload를 계획할 때」.
+- **기존 프로젝트를 나중에 가져온 경우**에는 코드·설정을 먼저 보고 plan 을 채우는 순서가 될 수 있다. 이후 작업에서는 여전히 `plan/workloads/{name}.md` 를 기준으로 맞춘다 (`.cursor/plan/README.md` 의 「이미 코드가 있고 나중에 붙인 경우」).
+- **역할 분리:**  
+  - **제품·범위 SoT:** `plan/workloads/{name}.md`  
+  - **리팩토링 이슈·Rev·체크리스트:** `refactoring/workloads/{name}.md` (있을 때만, plan 다음에 읽음)
+
+이 룰은 `AGENTS.md` 의 **Workload 대상 작업 공통**과 같다.
