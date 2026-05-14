@@ -31,4 +31,20 @@ locals {
     assume_role_policy = data.aws_iam_policy_document.ec2_assume_role_policy.json
     policy_arn         = data.aws_iam_policy.aws_ssm_core_policy.arn
   }
+
+  s3bucket = {
+    name   = "tfstate"
+    bucket = "${local.org}-tfstate"
+
+    versioning_configuration = {
+      status = "Enabled"
+    }
+
+    public_access_block = {
+      block_public_acls       = true
+      block_public_policy     = true
+      ignore_public_acls      = true
+      restrict_public_buckets = true
+    }
+  }
 }
