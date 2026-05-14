@@ -44,7 +44,7 @@ resource "aws_security_group" "this" {
   }
 }
 
-resource "aws_instance" "web" {
+resource "aws_instance" "this" {
   ami                         = local.instance.ami
   instance_type               = local.instance.instance_type
   subnet_id                   = local.instance.subnet_id
@@ -63,7 +63,7 @@ resource "aws_instance" "web" {
 }
 
 # resource "aws_s3_bucket" "tfstate" {
-#   bucket = "tf-core-tfstate"
+#   bucket = "tf-core-ej-tfstate"
 # }
 resource "aws_s3_bucket" "this" {
   bucket = local.s3bucket.bucket
@@ -72,6 +72,7 @@ resource "aws_s3_bucket" "this" {
     Name = "${local.namespace}-s3bucket-${local.s3bucket.name}"
   }
 
+  # 삭제 방지
   lifecycle {
     prevent_destroy = true
   }

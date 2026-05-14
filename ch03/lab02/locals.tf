@@ -36,6 +36,7 @@ locals {
     name   = "tfstate"
     bucket = "${local.org}-tfstate"
 
+    # 버전 관리 활성화 (수정 후 apply시 계속 history가 버킷에 기록됨)
     versioning_configuration = {
       status = "Enabled"
     }
