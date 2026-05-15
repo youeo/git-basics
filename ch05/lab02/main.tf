@@ -16,17 +16,16 @@ resource "aws_internet_gateway" "main" {
   }
 }
 
-resource "aws_security_group" "instance" {
+resource "aws_security_group" "main" {
+  for_each = local.sg_config
+
   vpc_id = aws_vpc.main.id
 
   dynamic "ingress" {
-	  # for expression으로 전처리된 값을 받아옴
-    for_each = toset(local.sg_config)
-    
-    # iterator가 생략됐으므로 블록 이름(ingress)가 접근자가 됨
+	  # local에서 필터링된 값에 의해 각각 설정됨
+    for_each = toset([each.value])
 
     content {
-	    # <인수> = <iterator>.value.<속성>
       from_port   = ingress.value.port
       to_port     = ingress.value.port
       protocol    = "tcp"
@@ -34,15 +33,19 @@ resource "aws_security_group" "instance" {
     }
   }
 
-	# 얘는 모든 타입의 보안 그룹에 들어가는 내용이라 블록 밖에서 설정
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+  dynamic "egress" {
+	  # instance-service인 항목만 egress가 만들어짐
+    for_each = toset(each.key == "instance-service" ? [1] : [])
+
+    content {
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
   }
 
   tags = {
-    Name = "${local.namespace}-sg-instance"
+    Name = "${local.namespace}-sg-${each.key}"
   }
 }
