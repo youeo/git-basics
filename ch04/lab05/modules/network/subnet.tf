@@ -34,24 +34,6 @@ resource "aws_subnet" "private_0" {
   }
 }
 
-resource "aws_route_table" "private_0" {
-  vpc_id = aws_vpc.this.id
-
-  route {
-    cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.this.id
-  }
-
-  tags = {
-    Name = "${local.namespace}-rtb-${local.subnet_private[0].name}"
-  }
-}
-
-resource "aws_route_table_association" "private_0" {
-  subnet_id      = aws_subnet.private_0.id
-  route_table_id = aws_route_table.private_0.id
-}
-
 # private subnet_1
 resource "aws_subnet" "private_1" {
   vpc_id                  = aws_vpc.this.id
@@ -90,6 +72,19 @@ resource "aws_route_table" "public_1" {
   }
 }
 
+resource "aws_route_table" "private_0" {
+  vpc_id = aws_vpc.this.id
+
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.this.id
+  }
+
+  tags = {
+    Name = "${local.namespace}-rtb-${local.subnet_private[0].name}"
+  }
+}
+
 resource "aws_route_table" "private_1" {
   vpc_id = aws_vpc.this.id
 
@@ -111,6 +106,11 @@ resource "aws_route_table_association" "public_0" {
 resource "aws_route_table_association" "public_1" {
   subnet_id      = aws_subnet.public_1.id
   route_table_id = aws_route_table.public_1.id
+}
+
+resource "aws_route_table_association" "private_0" {
+  subnet_id      = aws_subnet.private_0.id
+  route_table_id = aws_route_table.private_0.id
 }
 
 resource "aws_route_table_association" "private_1" {
