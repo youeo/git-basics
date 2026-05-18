@@ -18,6 +18,7 @@ output "lb" {
 
       target_group = {
         arn = aws_lb_target_group.this.arn
+        health_check = aws_lb_target_group.this.health_check[0]
       }
     }
   }
