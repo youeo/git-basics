@@ -3,7 +3,7 @@ variable "environment" {
 }
 
 variable "infra_db_username" {
-  type = string
+  type      = string
   sensitive = true
 }
 
