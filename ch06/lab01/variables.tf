@@ -2,6 +2,16 @@ variable "environment" {
   type = string
 }
 
+variable "infra_db_username" {
+  type = string
+  sensitive = true
+}
+
+variable "infra_db_password" {
+  type      = string
+  sensitive = true
+}
+
 variable "infra_lb_listener_port" {
   type = number
 }

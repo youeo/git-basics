@@ -6,6 +6,10 @@ locals {
   namespace = "${local.org}-${local.project}-${local.environment}"
 
   infra = {
+    db = {
+      username = var.infra_db_username
+      password = var.infra_db_password
+    }
     lb = {
         listener_port = var.infra_lb_listener_port
     }
