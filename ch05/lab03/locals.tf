@@ -17,7 +17,7 @@ locals {
   platform = {
     lb = {
       subnets  = ["public-a", "public-b"]
-      listener = { port = 80, cidrs = ["0.0.0.0/0"] }
+      listener = { port = 80, cidrs = ["10.0.0.0/16"] }
     }
   }
 

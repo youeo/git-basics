@@ -164,7 +164,8 @@ resource "aws_security_group" "main" {
   }
 
   dynamic "egress" {
-    for_each = each.key == "instance-service" ? [1] : []
+    # lb, instance 모두 egress가 있어야 통신이 됨
+    for_each = [1]
 
     content {
       from_port   = 0
@@ -172,6 +173,11 @@ resource "aws_security_group" "main" {
       protocol    = "-1"
       cidr_blocks = ["0.0.0.0/0"]
     }
+  }
+  
+  tags = {
+    # each에 들어오는 값이 "lb-listener" = { port=80, ... } 같은 경우 key를 써야함
+    Name = "${local.namespace}-instance-${each.key}"
   }
 }
 
@@ -192,6 +198,7 @@ resource "aws_instance" "main" {
 
   depends_on = [aws_iam_role_policy_attachment.this]
 
+  # each에 들어오는 값이 ["public-a", "public-b"]와 같은 경우 value를 써야함
   tags = {
     Name = "${local.namespace}-instance-${each.value}"
   }
