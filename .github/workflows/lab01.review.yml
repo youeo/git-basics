@@ -27,13 +27,12 @@ jobs:
           terraform_version: ${{env.TF_VERSION}}
 
       - name: Terraform Init
-        run: terraform init
+        run: terraform Init
 
       - name: Terraform plan
         id: plan
         run: terraform plan
 
       - name: Fail if Plan Failed
-        # if문 안에서 작은 따옴표 사용하기
-        if: steps.plan.outcome == 'failure'
+        if: steps.plan.outcome == "failure"
         run: exit 1
