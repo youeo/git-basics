@@ -3,7 +3,7 @@ locals {
   project   = "lab02"
   namespace = "${local.org}-${local.project}"
 
-  github_repo = "OWNER/REPO"
+  github_repo = "youeo/git-basics"
 
   iamrole = {
     name       = "gha"
