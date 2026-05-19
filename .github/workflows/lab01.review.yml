@@ -1,0 +1,38 @@
+name: ch07.lab01 review
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize]
+    paths: ["ch07/lab01/*.tf"]
+
+
+env:
+  TF_VERSION: "1.14.7"
+  WORKING_DIR: "ch07/lab01"
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{env.WORKING_DIR}}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: ${{env.TF_VERSION}}
+
+      - name: Terraform Init
+        run: terraform Init
+
+      - name: Terraform plan
+        id: plan
+        run: terraform plan
+
+      - name: Fail if Plan Failed
+        if: steps.plan.outcome == "failure"
+        run: exit 1
