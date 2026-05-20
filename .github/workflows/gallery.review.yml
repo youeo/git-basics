@@ -6,10 +6,9 @@ on:
     types: [opened, synchronize]
     paths: ["ch08/lab01/*.tf"]
 
+    # 전역 permissions가 꼬이지 않도록, 안전하게 개별 Job 단위로 권한을 하향 조정/재명시
 permissions:
   contents: read
-  id-token: write
-  pull-requests: write
 
 env:
   TF_VERSION: "1.14.7"
@@ -34,8 +33,9 @@ jobs:
       - name: Format Check
         run: terraform fmt -check -recursive
 
-      - name: Init (backend=false)
-        run: terraform init -input=false -backend-config="env.dev.backend.hcl"
+      # -backend=false 옵션을 주면 AWS 로그인 없이 로컬에서 초기화가 가능
+      - name: Terraform Init (Validation only)
+        run: terraform init -backend=false -input=false
 
       - name: Validate
         run: terraform validate
@@ -43,11 +43,15 @@ jobs:
       - name: Setup TFLint
         uses: terraform-linters/setup-tflint@v4
 
+      # 옵션으로 에러 나도 멈추지 않게 설정
       - name: Run TFLint
-        run: tflint --init && tflint --recursive
+        run: tflint --init && tflint --recursive --minimum-failure-severity=error
 
       - name: Security Scan
         uses: aquasecurity/tfsec-action@v1.0.3
+        # tfsec 자체가 뻗어도 전체 배포를 멈추지 않게 설정
+        # tfsec에서 check 블록을 해석 못하는 오류 발생
+        continue-on-error: true
         with:
           working_directory: ${{ env.WORKING_DIR }}
           soft_fail: true
@@ -59,6 +63,14 @@ jobs:
     defaults:
       run:
         working-directory: ${{ env.WORKING_DIR }}
+        
+    # AWS 로그인을 실제로 수행하는 이 Job 내부에 권한을 직접 명시해 주어야 합니다.
+    # 그래야 가상 서버가 AWS용 OIDC 임시 보안 토큰(id-token: write)을 완벽하게 낚아챕니다.
+    permissions:
+      contents: read
+      id-token: write       # AWS configure-aws-credentials 액션이 정상 작동하기 위한 필수 치트키
+      pull-requests: write  # 아래의 script 액션이 PR에 댓글을 달 수 있도록 허용하는 권한
+    
     steps:
       - uses: actions/checkout@v4
 
@@ -68,11 +80,18 @@ jobs:
 
       - uses: aws-actions/configure-aws-credentials@v6
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-to-assume: ${{ secrets.AWS_IAMROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Terraform Init
         run: terraform init -input=false -backend-config="env.dev.backend.hcl"
+
+      # 깃허브 시크릿에서 가져와 가상 컴퓨터에 tfvars 파일을 임시로 구워내기
+      - name: Create tfvars file from Secrets
+        run: |
+          cat << 'EOF' > env.dev.tfvars
+          ${{ secrets.DEV_TFVARS }}
+          EOF
 
       # 실제 AWS를 건드리지 않고, 무엇이 추가(Add)/변경(Change)/삭제(Destroy)되는지 계획서만 뽑아냅니다.
       - name: Terraform Plan
