@@ -1,0 +1,73 @@
+name: "Gallery Deploy"
+
+on:
+  push:
+    branches: [main]
+    paths: ["10.05/gallery/**"]
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  TF_VERSION: "1.14.7"
+  AWS_REGION: "ap-northeast-2"
+  WORKING_DIR: "10.05/gallery"
+
+jobs:
+  deploy-dev:
+    runs-on: ubuntu-latest
+    environment: dev
+    concurrency:
+      group: gallery-dev
+      cancel-in-progress: false
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIR }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+      - uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_IAMROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+      
+      - name: Create dev tfvars file from Secrets
+        run: |
+          cat << 'EOF' > env.dev.tfvars
+          ${{ secrets.DEV_TFVARS }}
+          EOF
+
+      - run: terraform init -input=false -backend-config="env.dev.backend.hcl"
+      - run: terraform apply -input=false -auto-approve -var-file="env.dev.tfvars"
+
+  deploy-prod:
+    needs: deploy-dev
+    runs-on: ubuntu-latest
+    environment: prod
+    concurrency:
+      group: gallery-prod
+      cancel-in-progress: false
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIR }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+      - uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Create prod tfvars file from Secrets
+        run: |
+          cat << 'EOF' > env.prod.tfvars
+          ${{ secrets.PROD_TFVARS }}
+          EOF
+
+      - run: terraform init -input=false -backend-config="env.prod.backend.hcl"
+      - run: terraform apply -input=false -auto-approve -var-file="env.prod.tfvars"
