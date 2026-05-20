@@ -5,6 +5,9 @@ on:
     branches: [main]
     paths: ["ch08/lab01/**"]
 
+  # 깃허브 웹 화면에 [수동 배포 시작] 버튼을 만들어줌
+  workflow_dispatch:
+
 permissions:
   contents: read
   id-token: write
@@ -60,7 +63,7 @@ jobs:
           terraform_version: ${{ env.TF_VERSION }}
       - uses: aws-actions/configure-aws-credentials@v6
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-to-assume: ${{ secrets.AWS_IAMROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Create prod tfvars file from Secrets
