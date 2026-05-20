@@ -33,7 +33,7 @@ module "workload" {
   lt_service_port              = local.infra.lt.service_port
   lt_allow_access_cidr_blocks  = [module.network.subnet["public-a"].cidr_block, module.network.subnet["public-b"].cidr_block]
   lt_iam_instance_profile_name = module.platform.iamprofile["lt-web"].name
-  lt_instance_type = local.infra.lt.instance_type
+  lt_instance_type             = local.infra.lt.instance_type
 }
 
 check "gallery_health" {

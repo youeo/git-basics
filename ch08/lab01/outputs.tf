@@ -20,7 +20,7 @@ output "lb" {
 
       target_group = {
         arn = module.platform.lb["main"].target_group.arn
-        health_check = {                                    
+        health_check = {
           path = module.platform.lb["main"].target_group.health_check.path
         }
       }
