@@ -3,7 +3,7 @@ name: "Gallery Deploy"
 on:
   push:
     branches: [main]
-    paths: ["10.05/gallery/**"]
+    paths: ["ch08/lab01/**"]
 
 permissions:
   contents: read
@@ -12,7 +12,7 @@ permissions:
 env:
   TF_VERSION: "1.14.7"
   AWS_REGION: "ap-northeast-2"
-  WORKING_DIR: "10.05/gallery"
+  WORKING_DIR: "ch08/lab01"
 
 jobs:
   deploy-dev:
